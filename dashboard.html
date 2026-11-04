@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#10283E" />
+  <title>Документы — MARS</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./script.js" defer></script>
+</head>
+<body class="workspace">
+  <div class="ambient" aria-hidden="true"></div>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><defs>
+    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></symbol>
+    <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><ellipse cx="12" cy="12" rx="4" ry="9"/><path d="M3 12h18"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="3"/><circle cx="15" cy="17" r="3"/></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 5 .5c0 2-2.5 2-2.5 4M12 17h.01"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Zm0 0v6h6M8 13h8M8 17h5"/></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><path d="m3 13 3-9h12l3 9v7H3Zm0 0h5l2 3h4l2-3h5"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="m15 4 5 5M4 20l5-1L21 7a2 2 0 0 0-5-5L4 14ZM13 20h7"/></symbol>
+    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9Z"/></symbol>
+    <symbol id="i-archive" viewBox="0 0 24 24"><path d="M4 8v12h16V8M9 12h6"/><rect x="3" y="3" width="18" height="5" rx="1"/></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 4H4v16h5M9 12h12m-4-4 4 4-4 4"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 5 5"/></symbol>
+    <symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 7h16M7 12h10M10 17h4"/></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 5 7 7-7 7"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M6 18 18 6"/></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+    <symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="3"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-5-5 5 5-5 5"/></symbol>
+  </defs></svg>
+  <a class="skip-link" href="#workspace-main">К документам</a>
+  <div class="app-shell">
+    <nav class="app-rail" aria-label="Приложение">
+      <a class="rail-mark" href="./dashboard.html" aria-label="MARS — рабочее пространство">M</a>
+      <button class="rail-button is-active" type="button" data-section="all" aria-label="Документы" title="Документы"><svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg></button>
+      <button class="rail-button" type="button" data-info="space" aria-label="О пространстве" title="О пространстве"><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg></button>
+      <button class="rail-button" type="button" data-info="settings" aria-label="Настройки вида" title="Настройки вида"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg></button>
+      <button class="rail-button rail-bottom" type="button" data-info="help" aria-label="Помощь" title="Помощь"><svg class="icon" aria-hidden="true"><use href="#i-help"/></svg></button>
+    </nav>
+    <aside class="app-sidebar" id="app-sidebar" aria-label="Навигация по документам">
+      <div class="sidebar-brand"><span class="workspace-wordmark">MARS</span><button class="icon-button mobile-only" id="close-navigation" type="button" aria-label="Закрыть навигацию"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+      <button class="space-switch" type="button" data-info="space"><span class="space-icon"><svg class="icon" aria-hidden="true"><use href="#i-globe"/></svg></span><span><strong>Личное пространство</strong><small>Документы и задачи</small></span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg></button>
+      <nav class="document-nav" aria-label="Разделы">
+        <p class="nav-heading">Рабочая область</p>
+<button class="nav-item" type="button" data-section="all" aria-current="page"><svg class="icon" aria-hidden="true"><use href="#i-doc"/></svg><span>Все документы</span><span class="nav-count" data-count="all">0</span></button>
+<button class="nav-item" type="button" data-section="inbox"><svg class="icon" aria-hidden="true"><use href="#i-inbox"/></svg><span>Входящие</span><span class="nav-count" data-count="inbox">0</span></button>
+<button class="nav-item" type="button" data-section="progress"><svg class="icon" aria-hidden="true"><use href="#i-clock"/></svg><span>В работе</span><span class="nav-count" data-count="progress">0</span></button>
+<button class="nav-item" type="button" data-section="done"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg><span>Завершённые</span><span class="nav-count" data-count="done">0</span></button>
+        <p class="nav-heading nav-heading--second">Личное</p>
+<button class="nav-item" type="button" data-section="draft"><svg class="icon" aria-hidden="true"><use href="#i-edit"/></svg><span>Черновики</span><span class="nav-count" data-count="draft">0</span></button>
+<button class="nav-item" type="button" data-section="favorites"><svg class="icon" aria-hidden="true"><use href="#i-star"/></svg><span>Избранное</span><span class="nav-count" data-count="favorites">0</span></button>
+<button class="nav-item" type="button" data-section="archive"><svg class="icon" aria-hidden="true"><use href="#i-archive"/></svg><span>Архив</span><span class="nav-count" data-count="archive">0</span></button>
+      </nav>
+      <div class="sidebar-bottom"><div class="local-note"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg><span>Локальное пространство<small>Данные в вашем браузере</small></span></div><button class="nav-item mobile-only" type="button" data-info="settings"><svg class="icon" aria-hidden="true"><use href="#i-settings"/></svg><span>Настройки вида</span></button><a class="nav-item logout-link" href="./index.html"><svg class="icon" aria-hidden="true"><use href="#i-logout"/></svg><span>Выйти</span></a></div>
+    </aside>
+    <button class="drawer-backdrop" id="drawer-backdrop" type="button" aria-label="Закрыть навигацию" hidden></button>
+    <main class="workspace-main" id="workspace-main" tabindex="-1">
+      <header class="workspace-topbar">
+        <div class="breadcrumbs"><button class="icon-button mobile-only" id="open-navigation" type="button" aria-label="Открыть навигацию" aria-expanded="false" aria-controls="app-sidebar"><svg class="icon" aria-hidden="true"><use href="#i-menu"/></svg></button><span class="breadcrumb-root">Рабочее пространство</span><svg class="icon" aria-hidden="true"><use href="#i-chevron"/></svg><span id="breadcrumb-section">Документы</span></div>
+        <div class="topbar-user"><span class="local-badge">Локально</span><button class="avatar" type="button" data-info="profile" aria-label="Ваше пространство" title="Ваше пространство">М</button></div>
+      </header>
+      <section class="document-workspace" aria-labelledby="section-title">
+        <div class="workspace-heading"><div><p class="section-eyebrow">ВАШЕ ПРОСТРАНСТВО</p><h1 id="section-title">Документы <span id="section-count" class="heading-count">0</span></h1><p id="section-description">Всё для работы с документами — в одном месте.</p></div><button class="submit-button create-button" type="button" data-create><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg><span>Создать документ</span></button></div>
+        <div class="documents-panel">
+          <div class="document-toolbar"><label class="document-search" for="document-search"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg><span class="sr-only">Поиск документов</span><input id="document-search" type="search" placeholder="Поиск документов…" autocomplete="off" /></label><button class="secondary-button filter-toggle" id="filter-toggle" type="button" aria-expanded="false" aria-controls="filter-panel"><svg class="icon" aria-hidden="true"><use href="#i-filter"/></svg><span>Фильтры</span><span id="filter-indicator" hidden>1</span></button></div>
+          <div class="filter-panel" id="filter-panel" hidden><label for="status-filter">Статус<select id="status-filter"><option value="all">Все статусы</option><option value="draft">Черновик</option><option value="inbox">Входящий</option><option value="progress">В работе</option><option value="done">Завершён</option><option value="archive">В архиве</option></select></label><label for="sort-order">Порядок<select id="sort-order"><option value="newest">Сначала новые</option><option value="title">По названию</option><option value="due">По сроку</option></select></label><button class="text-button" type="button" id="reset-filters">Сбросить</button></div>
+          <div class="document-table-wrap"><table class="document-table"><caption class="sr-only">Документы рабочего пространства</caption><thead><tr><th scope="col">Документ</th><th scope="col">Срок</th><th scope="col">Статус</th><th scope="col"><span class="sr-only">Избранное</span></th></tr></thead><tbody id="document-rows"></tbody></table></div>
+          <div class="empty-state" id="empty-state"><div class="empty-art" aria-hidden="true"><span class="empty-sheet empty-sheet--back"></span><span class="empty-sheet"><svg class="icon" aria-hidden="true"><use href="#i-doc"/></svg></span><span class="empty-spark"><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg></span></div><p class="empty-eyebrow">НАЧНИТЕ С ЧИСТОГО ЛИСТА</p><h2 id="empty-title">Здесь будут ваши документы</h2><p id="empty-description">Создайте первый документ.<br />Порядок начинается с одного простого шага.</p><button class="secondary-button" type="button" id="empty-action" data-create><svg class="icon" aria-hidden="true"><use href="#i-plus"/></svg>Создать документ</button></div>
+          <footer class="panel-footer"><span id="result-count" role="status" aria-live="polite">Документов: 0</span><span class="storage-hint"><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg>Только в этом браузере</span></footer>
+        </div>
+        <footer class="workspace-footer"><span>© MARS</span><span>Ваше пространство. Ваш порядок.</span></footer>
+      </section>
+    </main>
+  </div>
+  <dialog class="workspace-dialog" id="document-dialog" aria-labelledby="document-dialog-title">
+    <div class="dialog-heading"><div><p class="section-eyebrow">ДОКУМЕНТ</p><h2 id="document-dialog-title">Новый документ</h2></div><button class="icon-button" type="button" data-close="document-dialog" aria-label="Закрыть документ"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
+    <form id="document-form"><div><label for="document-title">Название <span aria-hidden="true">*</span></label><input id="document-title" name="title" placeholder="Например, план проекта" maxlength="120" aria-describedby="document-error" required /></div><div><label for="document-topic">Тема</label><textarea id="document-topic" name="topic" placeholder="Кратко опишите содержание" maxlength="2000" rows="3"></textarea></div><div class="dialog-columns"><div><label for="document-due">Срок исполнения</label><input id="document-due" name="due" type="date" /></div><div><label for="document-status">Статус</label><select id="document-status" name="status"><option value="draft">Черновик</option><option value="inbox">Входящий</option><option value="progress">В работе</option><option value="done">Завершён</option><option value="archive">В архиве</option></select></div></div><p class="dialog-note">Сохранится в этом браузере. Доступ с других устройств не предусмотрен.</p><p class="field-error" id="document-error" role="alert" hidden></p><div class="dialog-actions"><button class="secondary-button" type="button" data-close="document-dialog">Отмена</button><button class="submit-button" type="submit">Сохранить</button></div></form>
+  </dialog>
+  <dialog class="workspace-dialog info-dialog" id="info-dialog" aria-labelledby="info-title"><div class="dialog-heading"><h2 id="info-title"></h2><button class="icon-button" type="button" data-close="info-dialog" aria-label="Закрыть"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div><p id="info-description"></p><label class="density-option" id="density-option" hidden><input type="checkbox" id="compact-view" />Компактные строки документов</label><button class="secondary-button" type="button" data-close="info-dialog">Понятно</button></dialog>
+  <div class="workspace-toast" id="workspace-toast" role="status" aria-live="polite" hidden></div>
+</body>
+</html>
