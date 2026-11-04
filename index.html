@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#F7FAFF" />
+    <meta name="description" content="MARS — вход в систему." />
+    <title>MARS — Вход в систему</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./script.js" defer></script>
+  </head>
+  <body>
+    <div class="ambient" aria-hidden="true"></div>
+    <main class="main">
+      <section class="login-card" aria-labelledby="login-title" aria-describedby="login-subtitle">
+        <header class="card-heading">
+          <h1 id="login-title">MARS</h1>
+          <p id="login-subtitle">Вход в систему</p>
+        </header>
+        <form id="login-form">
+          <div class="field">
+            <label for="email">Электронная почта</label>
+            <div class="input-wrap">
+              <input id="email" name="email" type="email" placeholder="name@example.com" autocomplete="email" autocapitalize="none" spellcheck="false" required aria-describedby="email-error" />
+            </div>
+            <p class="field-error" id="email-error" hidden></p>
+          </div>
+          <div class="field">
+            <label for="password">Пароль</label>
+            <div class="input-wrap">
+              <input id="password" name="password" type="password" placeholder="Введите пароль" autocomplete="current-password" required aria-describedby="password-error" />
+              <button class="password-toggle" type="button" aria-label="Показать пароль" aria-controls="password" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M2.5 12s3.3-6 9.5-6 9.5 6 9.5 6-3.3 6-9.5 6-9.5-6-9.5-6Z" stroke="currentColor" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" stroke="currentColor" stroke-width="1.5"/><path class="eye-slash" d="m4 4 16 16" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg></button>
+            </div>
+            <p class="field-error" id="password-error" hidden></p>
+          </div>
+          <div class="recovery-row"><button class="text-button" id="forgot-password" type="button">Забыли пароль?</button></div>
+          <button class="submit-button" type="submit">Войти</button>
+          <p class="form-status" id="form-status" role="status" aria-live="polite" hidden></p>
+        </form>
+        <footer class="card-footer">© MARS</footer>
+      </section>
+    </main>
+  </body>
+</html>
