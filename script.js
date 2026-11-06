@@ -223,7 +223,17 @@
         (buttons[Math.min(index, buttons.length - 1)] || query('#section-title')).focus();
       } else notify('Не удалось сохранить. Проверьте доступ к хранилищу браузера.');
     });
-    actions.append(favorite);
+    const remove = document.createElement('button');
+    remove.type = 'button';
+    remove.className = 'icon-button document-delete';
+    remove.setAttribute('aria-label', `Удалить: ${item.title}`);
+    remove.title = 'Удалить';
+    remove.append(icon('trash'));
+    remove.addEventListener('click', () => confirmDocumentDeletion(item, remove));
+    const rowActions = document.createElement('div');
+    rowActions.className = 'document-row-actions';
+    rowActions.append(favorite, remove);
+    actions.append(rowActions);
     row.append(nameCell, dueCell, statusCell, actions);
     return row;
   }
@@ -268,6 +278,40 @@
   window.addEventListener('beforeunload', event => {
     const active = document.querySelector('dialog[open]');
     if (active && modalSessions.get(active)?.dirty()) { event.preventDefault(); event.returnValue = ''; }
+  });
+
+  const deleteDialog = query('#delete-document-dialog');
+  const deleteError = query('#delete-document-error');
+  let pendingDeleteId = null;
+  function confirmDocumentDeletion(item, opener) {
+    pendingDeleteId = item.id;
+    query('#delete-document-name').textContent = item.title;
+    deleteError.hidden = true;
+    showDialog(deleteDialog, () => false, opener);
+    query('#cancel-document-delete').focus();
+  }
+  deleteDialog.addEventListener('close', () => {
+    if (!deleteDialog.open) pendingDeleteId = null;
+  });
+  query('#confirm-document-delete').addEventListener('click', () => {
+    if (!deleteDialog.open || pendingDeleteId === null) return;
+    const next = documents.filter(item => item.id !== pendingDeleteId);
+    if (!persist(next)) {
+      deleteError.textContent = 'Не удалось удалить документ. Проверьте свободное место и разрешения хранилища браузера.';
+      deleteError.hidden = false;
+      query('#cancel-document-delete').focus();
+      return;
+    }
+    const session = modalSessions.get(deleteDialog);
+    const buttons = [...query('#document-rows').querySelectorAll('.document-delete')];
+    const index = buttons.indexOf(session.opener);
+    pendingDeleteId = null;
+    render();
+    // Keep the current search, filters and section; restore focus beside the removed row.
+    const remaining = query('#document-rows').querySelectorAll('.document-delete');
+    session.opener = remaining[Math.min(index, remaining.length - 1)] || query('#section-title');
+    deleteDialog.close();
+    notify('Документ удалён');
   });
 
   const center = query('#creation-dialog');

@@ -242,5 +242,117 @@ class CreationCenter(unittest.TestCase):
         self.page.set_viewport_size(dict(width=390,height=844)); self.page.locator('#open-navigation').click()
         self.page.locator('.logout-link').click(); self.page.wait_for_url('**/index.html')
 
+    def seed_deletion_documents(self):
+        target = dict(LEGACY, id='delete-me', title='План «MARS» <2027>', status='progress')
+        survivor = dict(LEGACY, id='keep-me', title='Оставить документ', favorite=False)
+        self.page.evaluate('''docs => {
+            localStorage.setItem('mars.documents.v1', JSON.stringify(docs));
+            localStorage.setItem('mars.templates.v1', '[]');
+            localStorage.setItem('mars.processes.v1', '[]');
+        }''', [target, survivor])
+        self.page.reload()
+        return target, survivor
+
+    def request_deletion(self):
+        button = self.page.get_by_role('button', name='Удалить: План «MARS» <2027>', exact=True)
+        button.click()
+        expect(self.page.locator('#delete-document-dialog')).to_be_visible()
+        return button
+
+    def stored_documents(self):
+        return self.page.evaluate('JSON.parse(localStorage.getItem("mars.documents.v1"))')
+
+    def test_09_delete_confirmation_opens_with_name_and_safe_focus(self):
+        target, survivor = self.seed_deletion_documents()
+        self.request_deletion()
+        expect(self.page.locator('#delete-document-name')).to_have_text(target['title'])
+        expect(self.page.locator('#cancel-document-delete')).to_be_focused()
+        self.assertEqual(self.page.locator('dialog[open]').count(), 1)
+        self.assertEqual(self.stored_documents(), [target, survivor])
+        for width, height in [(1366,768), (390,844), (360,800)]:
+            self.page.set_viewport_size(dict(width=width, height=height))
+            self.assertTrue(self.page.locator('#delete-document-dialog').evaluate('(e) => e.scrollWidth <= e.clientWidth + 1'))
+            self.assertTrue(self.page.evaluate('document.documentElement.scrollWidth <= innerWidth'))
+            self.page.screenshot(path=f'/tmp/mars-delete-{width}.png')
+
+    def test_10_delete_cancel_escape_and_backdrop_keep_document(self):
+        target, survivor = self.seed_deletion_documents()
+        for method in ['button', 'escape', 'backdrop']:
+            with self.subTest(method=method):
+                opener = self.request_deletion()
+                if method == 'button': self.page.locator('#cancel-document-delete').click()
+                elif method == 'escape': self.page.keyboard.press('Escape')
+                else: self.page.mouse.click(2, 2)
+                expect(self.page.locator('#delete-document-dialog')).not_to_be_visible()
+                expect(opener).to_be_focused()
+                self.assertEqual(self.stored_documents(), [target, survivor])
+                expect(self.page.locator('#document-rows tr')).to_have_count(2)
+                expect(self.page.locator('#workspace-toast')).not_to_be_visible()
+
+    def test_11_confirm_delete_updates_sections_counts_filters_and_toast(self):
+        _, survivor = self.seed_deletion_documents()
+        self.page.locator('[data-section=favorites]').click()
+        self.page.locator('#document-search').fill('MARS')
+        self.page.locator('#filter-toggle').click()
+        self.page.locator('#status-filter').select_option('progress')
+        self.page.locator('#sort-order').select_option('title')
+        self.request_deletion()
+        self.page.locator('#confirm-document-delete').click()
+        expect(self.page.locator('#delete-document-dialog')).not_to_be_visible()
+        expect(self.page.locator('#workspace-toast')).to_have_text('Документ удалён')
+        expect(self.page.locator('#workspace-toast')).to_be_visible()
+        expect(self.page.locator('#document-rows tr')).to_have_count(0)
+        expect(self.page.locator('#section-count')).to_have_text('0')
+        expect(self.page.locator('[data-count=all]')).to_have_text('1')
+        expect(self.page.locator('[data-count=progress]')).to_have_text('0')
+        expect(self.page.locator('[data-count=favorites]')).to_have_text('0')
+        expect(self.page.locator('#document-search')).to_have_value('MARS')
+        expect(self.page.locator('#status-filter')).to_have_value('progress')
+        expect(self.page.locator('#sort-order')).to_have_value('title')
+        expect(self.page.locator('#section-title')).to_be_focused()
+        self.assertEqual(self.stored_documents(), [survivor])
+        self.assertEqual(self.page.evaluate('[localStorage.getItem("mars.templates.v1"), localStorage.getItem("mars.processes.v1")]'), ['[]','[]'])
+        self.page.locator('.nav-item[data-section=all]').click()
+        expect(self.page.locator('#document-rows')).to_contain_text(survivor['title'])
+        self.page.locator('[data-section=progress]').click()
+        expect(self.page.locator('#document-rows tr')).to_have_count(0)
+
+    def test_12_deletion_persists_after_reload(self):
+        _, survivor = self.seed_deletion_documents()
+        self.request_deletion(); self.page.locator('#confirm-document-delete').click()
+        self.page.reload()
+        self.assertEqual(self.stored_documents(), [survivor])
+        expect(self.page.locator('#document-rows tr')).to_have_count(1)
+        expect(self.page.locator('#document-rows')).to_contain_text(survivor['title'])
+        expect(self.page.locator('[data-count=all]')).to_have_text('1')
+        expect(self.page.locator('[data-count=favorites]')).to_have_text('0')
+
+    def test_13_single_click_and_default_enter_cannot_delete(self):
+        target, survivor = self.seed_deletion_documents()
+        self.request_deletion()
+        self.assertEqual(self.stored_documents(), [target, survivor])
+        expect(self.page.locator('#document-rows tr')).to_have_count(2)
+        # Enter follows the safe default focus and cancels instead of confirming.
+        self.page.keyboard.press('Enter')
+        expect(self.page.locator('#delete-document-dialog')).not_to_be_visible()
+        self.assertEqual(self.stored_documents(), [target, survivor])
+        self.page.reload()
+        expect(self.page.locator('#document-rows tr')).to_have_count(2)
+
+    def test_14_delete_storage_failure_preserves_document(self):
+        target, survivor = self.seed_deletion_documents()
+        self.request_deletion()
+        self.page.evaluate('() => { Storage.prototype.setItem = () => { throw new DOMException("Denied", "SecurityError"); }; }')
+        self.page.locator('#confirm-document-delete').click()
+        expect(self.page.locator('#delete-document-dialog')).to_be_visible()
+        expect(self.page.locator('#delete-document-error')).to_contain_text('Не удалось удалить документ')
+        expect(self.page.locator('#cancel-document-delete')).to_be_focused()
+        expect(self.page.locator('#workspace-toast')).not_to_be_visible()
+        self.assertEqual(self.stored_documents(), [target, survivor])
+        self.page.locator('#cancel-document-delete').click()
+        expect(self.page.locator('#document-rows tr')).to_have_count(2)
+        self.page.reload()
+        expect(self.page.locator('#document-rows tr')).to_have_count(2)
+
 if __name__ == '__main__':
     unittest.main(verbosity=2)

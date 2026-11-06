@@ -616,3 +616,25 @@ body.has-modal { overflow: hidden; }
 }
 @media (prefers-reduced-motion: reduce) { .creation-center *, .creation-card { transition: none; animation: none; scroll-behavior: auto; } .creation-card:hover { transform: none; } }
 @media (forced-colors: active) { .creation-card, .creation-modes button, .creation-categories button, .template-sheet { border: 1px solid ButtonText; } .creation-modes button[aria-selected=true], .creation-categories button[aria-current=true] { outline: 2px solid Highlight; } }
+
+/* Document deletion uses an explicit confirmation, with a quiet destructive accent. */
+.document-table th:last-child { width: 112px; }
+.document-row-actions { display: flex; align-items: center; justify-content: flex-end; gap: 4px; }
+.document-row-actions .icon-button { width: 36px; height: 36px; border-radius: 9px; flex-shrink: 0; }
+.document-delete { color: #bdafb3; }
+.document-delete:hover { color: #edc6c8; background: #a468701a; }
+.delete-dialog-icon { flex-shrink: 0; width: 24px; height: 24px; color: #d6aaae; }
+.delete-document-dialog > p { color: var(--muted); font-size: 14px; line-height: 1.8; }
+#delete-document-name { color: #edf3f8; font-weight: 500; overflow-wrap: anywhere; }
+.delete-document-dialog .dialog-actions { margin-top: 24px; }
+.delete-document-dialog .dialog-actions button { min-height: 44px; }
+.danger-button { color: #f1cdd0; border-color: #bc7e8666; background: linear-gradient(135deg, #784d5b88, #54374688); }
+.danger-button:hover { color: #ffe2e4; border-color: #d09ba380; background: #784d5ba6; }
+@media (max-width: 600px) {
+  .document-table th:last-child { width: 60px; }
+  .document-row-actions { flex-direction: column; gap: 2px; }
+  .document-row-actions .icon-button { width: 40px; height: 40px; }
+  .delete-document-dialog .dialog-actions { flex-wrap: wrap; }
+  .delete-document-dialog .dialog-actions button { flex: 1 1 auto; }
+}
+@media (forced-colors: active) { .danger-button { border: 2px solid ButtonText; color: ButtonText; background: Canvas; } }
