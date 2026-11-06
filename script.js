@@ -80,21 +80,14 @@
   const search = query('#document-search');
   const statusFilter = query('#status-filter');
   const sort = query('#sort-order');
-  const dialog = query('#document-dialog');
-  const form = query('#document-form');
-  const title = query('#document-title');
-  const topic = query('#document-topic');
-  const due = query('#document-due');
-  const documentStatus = query('#document-status');
-  const error = query('#document-error');
   const sidebar = query('#app-sidebar');
   const main = query('#workspace-main');
   const menuButton = query('#open-navigation');
   let documents = [];
   let section = 'all';
-  let editingId = null;
   let toastTimer;
   let storageReadable = true;
+  let documentsSnapshot = null;
 
   function notify(message) {
     clearTimeout(toastTimer);
@@ -103,9 +96,10 @@
     toastTimer = setTimeout(() => { query('#workspace-toast').hidden = true; }, 4500);
   }
 
-  // Only metadata is stored locally; login credentials never enter storage.
+  // Documents remain local; login credentials never enter storage.
   try {
     const saved = localStorage.getItem(storageKey);
+    documentsSnapshot = saved;
     if (saved) {
       const parsed = JSON.parse(saved);
       if (!Array.isArray(parsed) || !parsed.every(item =>
@@ -124,7 +118,10 @@
   function persist(next) {
     if (!storageReadable) return false;
     try {
-      localStorage.setItem(storageKey, JSON.stringify(next));
+      if (localStorage.getItem(storageKey) !== documentsSnapshot) { notify('Документы изменены в другой вкладке. Обновите страницу.'); return false; }
+      const serialized = JSON.stringify(next);
+      localStorage.setItem(storageKey, serialized);
+      documentsSnapshot = serialized;
       documents = next;
       return true;
     } catch {
@@ -241,7 +238,7 @@
   // A single native dialog is active at a time; document persistence remains unchanged.
   const modalSessions = new WeakMap();
   const formSnapshot = target => JSON.stringify([...new FormData(target)]);
-  const id = () => crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const id = MarsDocuments.id;
   function showDialog(target, dirty = () => false, opener = document.activeElement) {
     document.querySelectorAll('dialog[open]').forEach(other => { if (other !== target) other.close(); });
     modalSessions.set(target, { dirty, opener });
@@ -305,6 +302,7 @@
     const session = modalSessions.get(deleteDialog);
     const buttons = [...query('#document-rows').querySelectorAll('.document-delete')];
     const index = buttons.indexOf(session.opener);
+    session.documentId = pendingDeleteId;
     pendingDeleteId = null;
     render();
     // Keep the current search, filters and section; restore focus beside the removed row.
@@ -312,6 +310,7 @@
     session.opener = remaining[Math.min(index, remaining.length - 1)] || query('#section-title');
     deleteDialog.close();
     notify('Документ удалён');
+    MarsFiles.removeDocument(session.documentId).catch(() => notify('Документ удалён, но не удалось очистить его вложения.'));
   });
 
   const center = query('#creation-dialog');
@@ -463,8 +462,7 @@
       actions.append(action('Удалить', () => { if (window.confirm(`Удалить шаблон «${item.name}»? Созданные документы останутся.`) && writeStore(stores.templates, stores.templates.items.filter(t => t.id !== item.id))) { showCatalog(); } }, 'secondary-button', 'trash'));
     }
     actions.append(action('Использовать шаблон', () => {
-      const opener = modalSessions.get(center)?.opener;
-      openDocument(null, item.id === 'blank' && !item.custom ? { title: '', topic: '', due: '', status: 'draft' } : item.defaults, opener);
+      openDocument(null, item.id === 'blank' && !item.custom ? { title: '', topic: '', due: '', status: 'draft' } : item.defaults);
     }, 'submit-button'));
     detail.append(actions);
   }
@@ -561,50 +559,10 @@
     });
   });
 
-  function openDocument(item = null, defaults = null, opener = document.activeElement) {
-    editingId = item?.id ?? null;
-    form.reset();
-    title.value = item?.title ?? defaults?.title ?? '';
-    topic.value = item?.topic ?? defaults?.topic ?? '';
-    due.value = item?.due ?? defaults?.due ?? '';
-    documentStatus.value = item?.status ?? defaults?.status ?? (Object.hasOwn(statusNames, section) ? section : 'draft');
-    query('#document-dialog-title').textContent = item ? 'Редактирование документа' : 'Новый документ';
-    error.hidden = true;
-    title.removeAttribute('aria-invalid');
-    const baseline = formSnapshot(form);
-    showDialog(dialog, () => formSnapshot(form) !== baseline, opener);
-    title.focus();
+  function openDocument(item = null, defaults = null) {
+    try { MarsDocuments.open(item, defaults || {}); }
+    catch { showCenterError('Не удалось открыть редактор. Проверьте доступ к хранилищу браузера.'); }
   }
-
-  form.noValidate = true;
-  form.addEventListener('submit', event => {
-    event.preventDefault();
-    if (!title.value.trim() || !form.checkValidity()) {
-      error.textContent = 'Введите название и проверьте дату документа.';
-      error.hidden = false;
-      title.setAttribute('aria-invalid', String(!title.value.trim()));
-      title.focus();
-      return;
-    }
-    const existing = documents.find(item => item.id === editingId);
-    const item = {
-      id: existing?.id ?? (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`),
-      title: title.value.trim(), topic: topic.value.trim(), due: due.value,
-      status: documentStatus.value, favorite: existing?.favorite ?? false,
-      created: existing?.created ?? Date.now()
-    };
-    const next = existing ? documents.map(doc => doc.id === editingId ? item : doc) : [...documents, item];
-    if (!persist(next)) {
-      error.textContent = 'Не удалось сохранить документ. Проверьте свободное место и разрешения браузера.';
-      error.hidden = false;
-      return;
-    }
-    section = item.status;
-    resetFilters();
-    render();
-    dialog.close();
-    notify(existing ? 'Изменения сохранены' : 'Документ создан');
-  });
 
   document.querySelectorAll('[data-create]').forEach(button => button.addEventListener('click', () => openCreation()));
   document.querySelectorAll('[data-section]').forEach(button => button.addEventListener('click', () => {

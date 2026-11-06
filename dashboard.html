@@ -6,6 +6,7 @@
   <meta name="theme-color" content="#10283E" />
   <title>Документы — MARS</title>
   <link rel="stylesheet" href="./styles.css" />
+  <script src="./document-store.js" defer></script>
   <script src="./script.js" defer></script>
 </head>
 <body class="workspace">
@@ -98,10 +99,6 @@
     </div>
     <section class="creation-detail" id="creation-detail" aria-label="Предварительный просмотр или редактор" hidden></section>
     <footer class="creation-footer"><span><svg class="icon" aria-hidden="true"><use href="#i-lock"/></svg><span id="creation-local-note">Ваши идеи остаются в вашем пространстве</span></span><span class="creation-footer-hint">MARS / CREATION CENTER</span></footer>
-  </dialog>
-  <dialog class="workspace-dialog" id="document-dialog" aria-labelledby="document-dialog-title">
-    <div class="dialog-heading"><div><p class="section-eyebrow">ДОКУМЕНТ</p><h2 id="document-dialog-title">Новый документ</h2></div><button class="icon-button" type="button" data-close="document-dialog" aria-label="Закрыть документ"><svg class="icon" aria-hidden="true"><use href="#i-close"/></svg></button></div>
-    <form id="document-form"><div><label for="document-title">Название <span aria-hidden="true">*</span></label><input id="document-title" name="title" placeholder="Например, план проекта" maxlength="120" aria-describedby="document-error" required /></div><div><label for="document-topic">Тема</label><textarea id="document-topic" name="topic" placeholder="Кратко опишите содержание" maxlength="2000" rows="3"></textarea></div><div class="dialog-columns"><div><label for="document-due">Срок исполнения</label><input id="document-due" name="due" type="date" /></div><div><label for="document-status">Статус</label><select id="document-status" name="status"><option value="draft">Черновик</option><option value="inbox">Входящий</option><option value="progress">В работе</option><option value="done">Завершён</option><option value="archive">В архиве</option></select></div></div><p class="dialog-note">Сохранится в этом браузере. Доступ с других устройств не предусмотрен.</p><p class="field-error" id="document-error" role="alert" hidden></p><div class="dialog-actions"><button class="secondary-button" type="button" data-close="document-dialog">Отмена</button><button class="submit-button" type="submit">Сохранить</button></div></form>
   </dialog>
   <dialog class="workspace-dialog delete-document-dialog" id="delete-document-dialog" aria-labelledby="delete-document-title" aria-describedby="delete-document-description">
     <div class="dialog-heading"><h2 id="delete-document-title">Удалить документ?</h2><svg class="icon delete-dialog-icon" aria-hidden="true"><use href="#i-trash"/></svg></div>
